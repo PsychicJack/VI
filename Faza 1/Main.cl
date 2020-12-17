@@ -11,7 +11,7 @@
     ;;(odabirPrvogIgraca)
     ;;(odabirBoje)
 
-    (setq tableSize 6)
+    (setq tableSize 4)
     (setq table (initializeTable '0))
     ;;(princ "---------")
 
@@ -48,7 +48,7 @@
         )
      ) 
 )
-(defun initializeTableRow (rowIndex columnIndex)
+(defun initializeTableRow (rowIndex columnIndex);; promena iz '(- - - -) -> (list '- '- '- '-)
     (cond 
         ((<= columnIndex 0) '())
 		(t (if (= 4 tableSize)
@@ -61,14 +61,14 @@
     )
 )
 
-(defun potpunPrikaz ()
+(defun potpunPrikaz () ;; prikaz table sa prikazom numeracije polja
 (cond ((= tableSize 4) (format t "0123456789ABCDEF")) ((= tableSize 6) (format t "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
 (format t "~%")
 (prikazStanja tableSize tableSize 0 tableSize)
 (cond ((= tableSize 4) (format t "0123456789ABCDEF")) ((= tableSize 6) (format t "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
 )
 
-(defun prikazStanja (od do ind1 ind2)
+(defun prikazStanja (od do ind1 ind2) ;; radi prika table
     (decf ind2)
     (cond ((= ind2 -1) (setq ind2 0) (incf ind1)))
     (decf od)
@@ -76,7 +76,7 @@
     (cond ((= do 0) '()) (t (stampajRed od do 0 ind1 ind2) (format t "~%") (prikazStanja od do ind1 ind2)))
 )
  
-(defun stampajRed (od do count ind1 ind2)
+(defun stampajRed (od do count ind1 ind2) ;; stampa ceo red na prikazu, ne red u listi (npr. za prvi red "   -   -   -   -", za drugi "  --  --  --  --")
 
     (cond ((= count tableSize) '()) 
     (t  (stampajBlankoOd od '0) 
@@ -88,7 +88,7 @@
     )
 )
  
-(defun stampajBlankoOd (od trenutni)
+(defun stampajBlankoOd (od trenutni) ;; stampa razmake sa leve strane reda matrice
     (cond ((= od trenutni) '()) (t (format t " ") (stampajBlankoOd od (1+ trenutni))))
 )
 
@@ -100,7 +100,7 @@
     )
 )
 
-(defun stampajBlankoDo (stampajDo granica) 
+(defun stampajBlankoDo (stampajDo granica) ;; stampa razmake sa desne strane reda matrice
     (cond ((= stampajDo granica) '()) (t (format t " ") (stampajBlankoDo (1+ stampajDo) granica))) 
 )
 
@@ -108,17 +108,16 @@
     (potpunPrikaz)
     (format t "~%Potez: ")
     (setq potez (read))
-    (proveriPotez (write-to-string potez))
+    (proveriPotez (write-to-string potez));; write-to-string je obican convert to string, jer proveri potez radi samo sa stringovim
     (potez)
 )
 
-(defun proveriPotez (potez) 
-    (setq temp (- (char-code (char potez 0)) 55))
-    (cond ((< temp 10) (incf temp 7)))
-    (setq rbrReda (floor temp tableSize))
+(defun proveriPotez (potez) ;; proverava da li je potez validan i odigrava ga
+    (setq temp (- (char-code (char potez 0)) 55));; uzima prvi element iz string potez i odredjuje njegov char code. Oduzima 55 jer karakter A ima kod 65, a nama predstavlja broj 10. 
+    (cond ((< temp 10) (incf temp 7)));; posto postoji 7 mesta izmedju velikih slova i brojeva u ascii tabeli ukoliko je broj dodajemo mu 7
+    (setq rbrReda (floor temp tableSize));; odredjujemo rbrReda celobrojnim deljenjem
     (setq rbrStubica (mod temp tableSize))
-    ;;(princ rbrReda) (princ rbrStubica)
-    (cond ((or (>= rbrReda tableSize) (< rbrReda 0)) (format t "Nepravilan potez ~%") '()) 
+    (cond ((or (>= rbrReda tableSize) (< rbrReda 0)) (format t "Nepravilan potez ~%") '())
         (t 
             (cond ((equal (nth rbrStubica (nth 0 (nth rbrReda table)) ) '-) (odigrajPotez rbrReda rbrStubica (- tableSize 1)) (promeniIgraca)) (t (format t "Nepravilan potez ~%") '()))
         )
@@ -148,3 +147,10 @@
 ;;(princ (- (char-code (char "A" 0)) 55))
 
 
+;; 1 -> od = 3, do = 4, (0, 3)
+;; 2 -> od = 2, do = 4, (0, 2) (1, 3)
+;; 3 -> od = 1, do = 4, (0, 1) (1, 2) (2, 3)
+;; 4 -> od = 0, do = 4, (0, 0) (1, 1) (2, 2) (3, 3)
+;; 5 -> od = 0, dp = 3, (1, 0) (2, 1) (3, 2)
+;; 6 -> od = 0, do = 2, (2, 0) (3, 1)
+;; 7 -> od = 0, do = 1, (3, 0)
