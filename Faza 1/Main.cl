@@ -1,16 +1,16 @@
 (setq  polja '(0 1 2 3 4 5 6 7 8 9 A B C D E F))
-(setq matrica '(((0 1 2 3) (4 5 6 7) (8 9 A B) (C D E F)) ((G H I J) (K L M N) (O P Q R) (S T U V)) ((W X Y Z) (a b c d) (e f g h) (i j k l)) ((m n o p) (q r s t) (u v w x) (y z - +))))
+(setq matrica '(((0 1 2 3) (4 5 6 7) (8 9 A B) (C D E F)) ((G H I J) (K L M N) (O P Q R) (S T U V)) ((W X Y Z) (a b c d) (e f g h) (i j k l)) ((m - o p) (q r s t) (u v w x) (y z - +))))
 
 (defun main()
  ;;(princ "Size of table: ")
   ;;(setq tableSize (read))
-  (setq tableSize '4)
+  (setq tableSize 4)
   (setq table (initializeTable '0))
   ;;(princ "---------")
   (format t "~%")
   (potpunPrikaz)
   (format t "~%")
-  ;;(princ (char "A", 0))
+  (proveriPotez "A")
 )
 
 (defun initializeTable (rowIndex)
@@ -78,6 +78,23 @@
     (cond ((= stampajDo granica) '()) (t (format t " ") (stampajBlankoDo (1+ stampajDo) granica))) 
 )
 
+(defun proveriPotez (potez) 
+    (setq temp (- (char-code (char potez 0)) 55))
+    (cond ((< temp 10) (incf temp 7)))
+    (setq rbrReda (floor temp tableSize))
+    (setq rbrStubica (mod temp tableSize))
+    (cond ((or (>= rbrReda tableSize) (< rbrReda 0)) (princ "Nepravilan potez") '()) 
+        (t 
+            (cond ((equal (nth rbrStubica (nth 0 (nth rbrReda table)) ) '-) (odigrajPotez potez)) (t (princ "Nepravilan potez")))
+        )
+    )
+)
+
+(defun odigrajPotez (potez)
+    ()
+)
+
 (main)
 
 ;;(nth ind2 (nth ind1 (nth red matrica)))
+;;(princ (- (char-code (char "A" 0)) 55))
