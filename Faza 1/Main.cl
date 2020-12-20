@@ -1,18 +1,16 @@
-(setq  polja '(0 1 2 3 4 5 6 7 8 9 A B C D E F))
-(setq matrica '(((0 1 2 3) (4 5 6 7) (8 9 A B) (C D E F)) ((G H I J) (K L M N) (O P Q R) (S T U V)) ((W X Y Z) (a b c d) (e f g h) (i j k l)) ((m - o p) (q - s t) (u v w x) (y z - +))))
 
 (defun main()
     
-    ;;(princ "Size of table: ")
-    ;;(setq tableSize (read))
+    (princ "Unesite velicinu (4/6): ")
+    (setq velicinaTabele (read))
 
     (setq trentuniIgrac 'H)
     (setq trenutnaBoja 'X)
-    ;;(odabirPrvogIgraca)
-    ;;(odabirBoje)
+    (odabirPrvogIgraca)
+    (odabirBoje)
 
-    (setq tableSize 4)
-    (setq table (initializeTable '0))
+    ;;(setq velicinaTabele 4)
+    (setq tabela (inicijalizujTabelu '0))
     ;;(princ "---------")
 
     (format t "~%")
@@ -38,37 +36,37 @@
       (princ "Ulaz mora biti X ili O"))                       
 )
 
-(defun initializeTable (rowIndex)
+(defun inicijalizujTabelu (rbrReda)
     (cond
-        ((>= rowIndex tableSize) '())
+        ((>= rbrReda velicinaTabele) '())
         (t
-            (cons  (initializeTableRow rowIndex tableSize) 
-                (initializeTable (+ 1 rowIndex))
+            (cons  (inicijalizujRed rbrReda velicinaTabele) 
+                (inicijalizujTabelu (+ 1 rbrReda))
             )
         )
      ) 
 )
-(defun initializeTableRow (rowIndex columnIndex);; promena iz '(- - - -) -> (list '- '- '- '-)
+(defun inicijalizujRed (rbrReda rbrKolone);; promena iz '(- - - -) -> (list '- '- '- '-)
     (cond 
-        ((<= columnIndex 0) '())
-		(t (if (= 4 tableSize)
-     			(cons (list '- '- '- '-) (initializeTableRow rowIndex (- columnIndex 1))) 
-     			(if (= 6 tableSize)
-				(cons (list '- '- '- '- '- '-) (initializeTableRow rowIndex (- columnIndex 1)))
+        ((<= rbrKolone 0) '())
+		(t (if (= 4 velicinaTabele)
+     			(cons (list '- '- '- '-) (inicijalizujRed rbrReda (- rbrKolone 1))) 
+     			(if (= 6 velicinaTabele)
+				(cons (list '- '- '- '- '- '-) (inicijalizujRed rbrReda (- rbrKolone 1)))
 				(format t "Nije uneta ispravna vrednost za velicinu kocke")
 			))
      		)
     )
 )
 
-(defun potpunPrikaz () ;; prikaz table sa prikazom numeracije polja
-(cond ((= tableSize 4) (format t "0123456789ABCDEF")) ((= tableSize 6) (format t "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
-(format t "~%")
-(prikazStanja tableSize tableSize 0 tableSize)
-(cond ((= tableSize 4) (format t "0123456789ABCDEF")) ((= tableSize 6) (format t "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
+(defun potpunPrikaz () ;; prikaz tabela sa prikazom numeracije polja
+    (cond ((= velicinaTabele 4) (format t "0123456789ABCDEF")) ((= velicinaTabele 6) (format t "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
+    (format t "~%")
+    (prikazStanja velicinaTabele velicinaTabele 0 velicinaTabele)
+    (cond ((= velicinaTabele 4) (format t "0123456789ABCDEF")) ((= velicinaTabele 6) (format t "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
 )
 
-(defun prikazStanja (od do ind1 ind2) ;; radi prika table
+(defun prikazStanja (od do ind1 ind2) ;; radi prika tabela
     (decf ind2)
     (cond ((= ind2 -1) (setq ind2 0) (incf ind1)))
     (decf od)
@@ -78,10 +76,10 @@
  
 (defun stampajRed (od do count ind1 ind2) ;; stampa ceo red na prikazu, ne red u listi (npr. za prvi red "   -   -   -   -", za drugi "  --  --  --  --")
 
-    (cond ((= count tableSize) '()) 
+    (cond ((= count velicinaTabele) '()) 
     (t  (stampajBlankoOd od '0) 
         (stampajPolja od do count (1- ind1) (1- ind2))
-        (stampajBlankoDo do tableSize)
+        (stampajBlankoDo do velicinaTabele)
         
         (stampajRed od do (1+ count) ind1 ind2)
     )
@@ -96,7 +94,7 @@
     (incf ind1)
     (incf ind2)
     (cond ((= od do) '())
-    (t (princ (nth ind2 (nth ind1 (nth red table)))) (stampajPolja (1+ od) do red ind1 ind2))
+    (t (princ (nth ind2 (nth ind1 (nth red tabela)))) (stampajPolja (1+ od) do red ind1 ind2))
     )
 )
 
@@ -109,36 +107,42 @@
     (format t "~%Potez: ")
     (setq potez (read))
     (proveriPotez (write-to-string potez));; write-to-string je obican convert to string, jer proveri potez radi samo sa stringovim
-    (potez)
+    (cond ((jeKrajIgre 0 0) (potpunPrikaz)(format t "~%Kraj igre.")) 
+    (t (potez)))
 )
 
 (defun proveriPotez (potez) ;; proverava da li je potez validan i odigrava ga
     (setq temp (- (char-code (char potez 0)) 55));; uzima prvi element iz string potez i odredjuje njegov char code. Oduzima 55 jer karakter A ima kod 65, a nama predstavlja broj 10. 
     (cond ((< temp 10) (incf temp 7)));; posto postoji 7 mesta izmedju velikih slova i brojeva u ascii tabeli ukoliko je broj dodajemo mu 7
-    (setq rbrReda (floor temp tableSize));; odredjujemo rbrReda celobrojnim deljenjem
-    (setq rbrStubica (mod temp tableSize))
-    (cond ((or (>= rbrReda tableSize) (< rbrReda 0)) (format t "Nepravilan potez ~%") '())
+    (setq rbrReda (floor temp velicinaTabele));; odredjujemo rbrReda celobrojnim deljenjem
+    (setq rbrStubica (mod temp velicinaTabele))
+    (cond ((or (>= rbrReda velicinaTabele) (< rbrReda 0)) (format t "Nepravilan potez ~%") '())
         (t 
-            (cond ((equal (nth rbrStubica (nth 0 (nth rbrReda table)) ) '-) (odigrajPotez rbrReda rbrStubica (- tableSize 1)) (promeniIgraca)) (t (format t "Nepravilan potez ~%") '()))
+            (cond ((equal (nth rbrStubica (nth 0 (nth rbrReda tabela))) '-) (odigrajPotez rbrReda rbrStubica (- velicinaTabele 1)) (promeniIgraca)) (t (format t "Nepravilan potez ~%") '()))
         )
     )
 )
 
 (defun odigrajPotez (rbrReda rbrStubica trenutni) ;;ne proverava da li ima slobodnih mesta, jer je to provereno u proveriPotez
-    (cond ((equal  (nth rbrStubica (nth trenutni (nth rbrReda table))) '-)
-    (setf  (nth rbrStubica (nth trenutni (nth rbrReda table))) trenutnaBoja))
+    (cond ((equal  (nth rbrStubica (nth trenutni (nth rbrReda tabela))) '-)
+    (setf  (nth rbrStubica (nth trenutni (nth rbrReda tabela))) trenutnaBoja))
      (t (odigrajPotez rbrReda rbrStubica (1- trenutni)))
     )
 )
 
 (defun promeniIgraca () 
-(cond ((equal trentuniIgrac 'H) (setq trentuniIgrac 'C)) ((equal trentuniIgrac 'C) (setq trentuniIgrac 'H)))
-(cond ((equal trenutnaBoja 'X) (setq trenutnaBoja 'O)) ((equal trenutnaBoja 'O) (setq trenutnaBoja 'X)))
+    (cond ((equal trentuniIgrac 'H) (setq trentuniIgrac 'C)) ((equal trentuniIgrac 'C) (setq trentuniIgrac 'H)))
+    (cond ((equal trenutnaBoja 'X) (setq trenutnaBoja 'O)) ((equal trenutnaBoja 'O) (setq trenutnaBoja 'X)))
 )
 
 
-(defun jeKrajIgre () 
-
+(defun jeKrajIgre (rbrReda rbrStubica)
+    (cond ((>= rbrStubica velicinaTabele) (setq rbrStubica 0) (incf rbrReda)))
+    (cond ((>= rbrReda velicinaTabele) t) (t 
+    (cond ((not (equal (nth rbrStubica (nth 0 (nth rbrReda tabela))) '-)) (and t (jeKrajIgre rbrReda (1+ rbrStubica))))
+            (t '())
+    )))
+    
 )
 
 (main)
