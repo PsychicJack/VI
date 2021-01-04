@@ -1,18 +1,23 @@
-
+(setq matrica '(((0 1 2 3) (4 5 6 7) (8 9 A B) (C D E F)) ((G H I J) (K L M N) (O P Q R) (S T U V)) ((W X Y Z) (a b c d) (e f g h) (i j k l)) ((m - o p) (q - s t) (u v w x) (y z - +))))
 (defun main()
     
     (princ "Unesite velicinu (4/6): ")
-    (setq velicinaTabele (read))
-
+   ;; (setq velicinaTabele (read))
+    (setq velicinaTabele 6)
     (setq trentuniIgrac 'H)
     (setq trenutnaBoja 'X)
-    (odabirPrvogIgraca)
-    (odabirBoje)
+    ;;(odabirPrvogIgraca)
+   ;; (odabirBoje)
 
     ;;(setq velicinaTabele 4)
-    (setq tabela (inicijalizujTabelu '0))
+    //(setq tabela (inicijalizujTabelu '0))
     ;;(princ "---------")
-
+    ;;(setf (nth 0 (nth 0 (nth 0 tabela))) 'O)
+   ;; (setf (nth 0 (nth 1 (nth 0 tabela))) 'O)
+    ;;(setf (nth 0 (nth 2 (nth 0 tabela))) 'O)
+   ;; (setf (nth 0 (nth 3 (nth 0 tabela))) 'O)
+   ;; (setf (nth 0 (nth 4 (nth 0 tabela))) 'O)
+    ;;(setf (nth 0 (nth 5 (nth 0 tabela))) 'O)
     (format t "~%")
     (potez)
 )
@@ -107,8 +112,8 @@
     (format t "~%Potez: ")
     (setq potez (read))
     (proveriPotez (write-to-string potez));; write-to-string je obican convert to string, jer proveri potez radi samo sa stringovim
-    (cond ((jeKrajIgre 0 0) (potpunPrikaz)(format t "~%Kraj igre.")) 
-    (t (potez)))
+    (cond ((jeKrajIgre 0 0) (potpunPrikaz) (proveriPoene)(format t "~%Kraj igre.")) 
+    (t (proveriPoene) (potez)))
 )
 
 (defun proveriPotez (potez) ;; proverava da li je potez validan i odigrava ga
@@ -142,6 +147,38 @@
     (cond ((not (equal (nth rbrStubica (nth 0 (nth rbrReda tabela))) '-)) (and t (jeKrajIgre rbrReda (1+ rbrStubica))))
             (t '())
     )))
+    
+)
+
+(defun proveriPoene ()
+    (setq xPoints 0)
+    (setq oPoints 0)
+    (proveriSveY 0 0)
+    (format t "~% xPoints: ")
+    (princ xPoints)
+    (format t "~% oPoints: ")
+    (princ oPoints)
+    (format t "~%")
+)
+
+(defun proveriSveY (z x) 
+    (cond ((= z velicinaTabele) (setf z 0) (incf x)))
+    (cond ((= x velicinaTabele) '())
+    (t 
+        (proveriY z (1- velicinaTabele) x 0 0)
+        (proveriSveY (1+ z) x)
+    ))
+)
+
+(defun proveriY (z y x xNiz oNiz)
+    (cond ((= y -1) '()) 
+    (t
+        (setq polje (nth z (nth y (nth x tabela))))
+        (cond ((equal polje '-) '()) 
+            ((equal polje 'X) (incf xNiz) (cond ((= xNiz 4) (decf xNiz) (incf xPoints))) (setf oNiz 0) (proveriY z (1- y) x xNiz oNiz))
+            ((equal polje 'O) (incf oNiz) (cond ((= oNiz 4) (decf oNiz) (incf oPoints))) (setf xNiz 0) (proveriY z (1- y) x xNiz oNiz))
+        )
+    ))   
     
 )
 
