@@ -2,12 +2,12 @@
 (defun main()
     
     (princ "Unesite velicinu (4/6): ")
-   ;; (setq velicinaTabele (read))
-    (setq velicinaTabele 6)
-    (setq trentuniIgrac 'H)
-    (setq trenutnaBoja 'X)
-    ;;(odabirPrvogIgraca)
-   ;; (odabirBoje)
+    (setq velicinaTabele (read))
+    ;(setq velicinaTabele 6)
+    ;(setq trentuniIgrac 'H)
+    ;(setq trenutnaBoja 'X)
+    (odabirPrvogIgraca)
+    (odabirBoje)
 
     ;;(setq velicinaTabele 4)
     (setq tabela (inicijalizujTabelu '0))
@@ -27,8 +27,12 @@
     ;(setf (nth 2 (nth 1 (nth 1 tabela))) 'O)
     ;(setf (nth 1 (nth 2 (nth 2 tabela))) 'O)
     ;(setf (nth 0 (nth 3 (nth 3 tabela))) 'O)
+
+    (setq tabelaZaIspitivanje (copy-tree tabela))
+
     (format t "~%")
-    (potez)
+    (ispitajPoteze tabela)
+    (potez tabela)
 )
 
 (defun odabirPrvogIgraca () 
@@ -116,32 +120,75 @@
     (cond ((= stampajDo granica) '()) (t (format t " ") (stampajBlankoDo (1+ stampajDo) granica))) 
 )
 
-(defun potez ()
-    (potpunPrikaz)
-    (format t "~%Potez: ")
-    (setq potez (read))
-    (proveriPotez (write-to-string potez));; write-to-string je obican convert to string, jer proveri potez radi samo sa stringovim
-    (cond ((jeKrajIgre 0 0) (potpunPrikaz) (proveriPoene)(format t "~%Kraj igre.")) 
-    (t (proveriPoene) (potez)))
+(defun ispitajPoteze(tabelaZaIspitivanje)
+  (setq lista '())
+   (setq polja4 (list 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15))
+   (setq polja6 (list 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36))
+       (cond((= velicinaTabele 4)
+           (proveriPoteze  (car polja4) tabelaZaIspitivanje (cdr polja4)))         
+        (t (proveriPoteze  (car polja6) tabelaZaIspitivanje (cdr polja6)))
+               )
+  (setq lista (reverse lista))
+  (format t "~% Konacna lista: ") (princ lista) (format t "~%") 
+)
+ 
+(defun proveriPoteze (potez tabelaZaIspitivanje ostatakliste)
+    
+    (setq rbrReda (floor potez velicinaTabele))
+    (setq rbrStubica (mod potez velicinaTabele))
+    ;;(princ rbrReda) (format t "~%") (princ rbrStubica) (format t "~%")
+    (cond ((or (>= rbrReda velicinaTabele) (< rbrReda 0)) '() )
+        (t 
+         (cond ((equal (nth rbrStubica (nth 0 (nth rbrReda tabelaZaIspitivanje))) '-) 
+                (push potez lista) ;(princ lista) (format t "~%") 
+                )
+               (t '() ))
+        )
+          ) 
+    (cond ((equal (car ostatakliste) '()) ()) (t (proveriPoteze (car ostatakliste) tabelaZaIspitivanje (cdr ostatakliste)))) 
+    
 )
 
-(defun proveriPotez (potez) ;; proverava da li je potez validan i odigrava ga
-    (setq temp (- (char-code (char potez 0)) 55));; uzima prvi element iz string potez i odredjuje njegov char code. Oduzima 55 jer karakter A ima kod 65, a nama predstavlja broj 10. 
-    (cond ((< temp 10) (incf temp 7)));; posto postoji 7 mesta izmedju velikih slova i brojeva u ascii tabeli ukoliko je broj dodajemo mu 7
-    (setq rbrReda (floor temp velicinaTabele));; odredjujemo rbrReda celobrojnim deljenjem
+
+(defun potez (tabelaZaIspitivanje)
+  
+   
+    (format t "~%Potez: ")
+    (setq potez (read))
+    (proveriPotez (write-to-string potez) tabelaZaIspitivanje)
+  
+    (potpunPrikaz)
+    (cond ((jeKrajIgre 0 0) (potpunPrikaz) (proveriPoene)(format t "~%Kraj igre.")) 
+    (t  (ispitajPoteze tabelaZaIspitivanje) (proveriPoene) (potez tabelaZaIspitivanje)))
+)
+
+ 
+
+(defun proveriPotez (potez tabelaZaIspitivanje)
+    (setq temp (- (char-code (char potez 0)) 55)) 
+    (cond ((< temp 10) (incf temp 7)))
+    (setq rbrReda (floor temp velicinaTabele))
     (setq rbrStubica (mod temp velicinaTabele))
     (cond ((or (>= rbrReda velicinaTabele) (< rbrReda 0)) (format t "Nepravilan potez ~%") '())
         (t 
-            (cond ((equal (nth rbrStubica (nth 0 (nth rbrReda tabela))) '-) (odigrajPotez rbrReda rbrStubica (- velicinaTabele 1)) (promeniIgraca)) (t (format t "Nepravilan potez ~%") '()))
+         (cond ((equal (nth rbrStubica (nth 0 (nth rbrReda tabelaZaIspitivanje))) '-) 
+               
+                (odigrajPotez rbrReda rbrStubica (- velicinaTabele 1) tabelaZaIspitivanje ) (promeniIgraca))
+          
+               (t (format t "Stubic je popunjen ~%") '()))
         )
-    )
+          )
+    
 )
 
-(defun odigrajPotez (rbrReda rbrStubica trenutni) ;;ne proverava da li ima slobodnih mesta, jer je to provereno u proveriPotez
-    (cond ((equal  (nth rbrStubica (nth trenutni (nth rbrReda tabela))) '-)
-    (setf  (nth rbrStubica (nth trenutni (nth rbrReda tabela))) trenutnaBoja))
-     (t (odigrajPotez rbrReda rbrStubica (1- trenutni)))
-    )
+
+(defun odigrajPotez (rbrReda rbrStubica trenutni tabelaZaIspitivanje)
+    (cond ((equal  (nth rbrStubica (nth trenutni (nth rbrReda tabelaZaIspitivanje))) '-)
+           (setf  (nth rbrStubica (nth trenutni (nth rbrReda tabelaZaIspitivanje))) trenutnaBoja)
+           )
+     (t (odigrajPotez rbrReda rbrStubica (1- trenutni) tabelaZaIspitivanje) )
+          )
+  (let ((tabela tabelaZaIspitivanje)))
 )
 
 (defun promeniIgraca () 
