@@ -11,10 +11,10 @@
 
     ;;(setq velicinaTabele 4)
     (setq tabela (inicijalizujTabelu '0))
-    ;;(setq tabela '(((x o x o) (x x o o) (o o x o) (o x x x))
-      ;;        ((x o x x) (x o x o) (x x x x) (o o o o))
-       ;;       ((x x x x) (o o x o) (o o o x) (x x x o) )
-         ;;     ((o o x x) (o o x o) (x o x o) (o o x o))))
+    ;;(setq tabela '(((x o x o) (x o x o) (x o x o) (x o x o))
+     ;;         ((x o x o) (x o x o) (x o x o) (x o x o))
+      ;;        ((x o x o) (x o x o) (x o x o) (x o x o) )
+       ;;       ((x o x o) (x o x o) (x o x o) (x o x o))))
     ;;(princ "---------")
     ;(setf (nth 4 (nth 3 (nth 4 tabela))) 'O)
     ;(setf (nth 3 (nth 2 (nth 3 tabela))) 'O)
@@ -129,7 +129,7 @@
         (t (proveriPoteze  (car polja6) tabelaZaIspitivanje (cdr polja6)))
                )
   (setq lista (reverse lista))
-  (format t "~% Konacna lista: ") (princ lista) (format t "~%") 
+  ;;(format t "~% Konacna lista: ") (princ lista) (format t "~%") 
 )
  
 (defun proveriPoteze (potez tabelaZaIspitivanje ostatakliste)
@@ -151,14 +151,17 @@
 
 
 (defun potez (tabelaZaIspitivanje)
-  
-   
+    (setq xPoints 0)
+    (setq oPoints 0)
+
     (format t "~%Potez: ")
     (setq potez (read))
     (proveriPotez (write-to-string potez) tabelaZaIspitivanje)
   
     (potpunPrikaz)
-    (cond ((jeKrajIgre 0 0) (potpunPrikaz) (proveriPoene)(format t "~%Kraj igre.")) 
+    (cond ((jeKrajIgre 0 0) (potpunPrikaz) (proveriPoene) (format t "~%Kraj igre. ")
+        (cond ((= (- xPoints oPoints) 0) (format t "Nereseno!")) ((> (- xPoints oPoints) 0) (format t "Pobednik je crni!")) ((< (- xPoints oPoints) 0) (format t "Pobednik je beli!")))
+    ) 
     (t  (ispitajPoteze tabelaZaIspitivanje) (proveriPoene) (potez tabelaZaIspitivanje)))
 )
 
@@ -207,8 +210,7 @@
 )
 
 (defun proveriPoene ()
-    (setq xPoints 0)
-    (setq oPoints 0)
+    
     (proveriSveY 0 0)
     (proveriSveZ (1- velicinaTabele) 0)
     (proveriSveX 0 (1- velicinaTabele))
