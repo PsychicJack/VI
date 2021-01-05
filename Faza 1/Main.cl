@@ -10,14 +10,18 @@
    ;; (odabirBoje)
 
     ;;(setq velicinaTabele 4)
-    //(setq tabela (inicijalizujTabelu '0))
+    (setq tabela (inicijalizujTabelu '0))
+    ;;(setq tabela '(((x o x o) (x x o o) (o o x o) (o x x x))
+      ;;        ((x o x x) (x o x o) (x x x x) (o o o o))
+       ;;       ((x x x x) (o o x o) (o o o x) (x x x o) )
+         ;;     ((o o x x) (o o x o) (x o x o) (o o x o))))
     ;;(princ "---------")
-    (setf (nth 1 (nth 5 (nth 5 tabela))) 'O)
-    (setf (nth 5 (nth 0 (nth 4 tabela))) 'O)
-    (setf (nth 4 (nth 0 (nth 3 tabela))) 'O)
-    (setf (nth 3 (nth 0 (nth 2 tabela))) 'O)
-    (setf (nth 2 (nth 0 (nth 1 tabela))) 'O)
-    (setf (nth 1 (nth 0 (nth 0 tabela))) 'O)
+    ;(setf (nth 4 (nth 3 (nth 4 tabela))) 'O)
+    ;(setf (nth 3 (nth 2 (nth 3 tabela))) 'O)
+    ;(setf (nth 2 (nth 1 (nth 2 tabela))) 'O)
+    ;(setf (nth 1 (nth 0 (nth 1 tabela))) 'O)
+    ;(setf (nth 0 (nth 0 (nth 0 tabela))) 'O)
+    ;(setf (nth 0 (nth 0 (nth 0 tabela))) 'O)
 
     ;(setf (nth 3 (nth 0 (nth 0 tabela))) 'O)
     ;(setf (nth 2 (nth 1 (nth 1 tabela))) 'O)
@@ -158,19 +162,20 @@
 (defun proveriPoene ()
     (setq xPoints 0)
     (setq oPoints 0)
-    ;(proveriSveY 0 0)
-    ;(proveriSveZ (1- velicinaTabele) 0)
-    ;(proveriSveX 0 (1- velicinaTabele))
+    (proveriSveY 0 0)
+    (proveriSveZ (1- velicinaTabele) 0)
+    (proveriSveX 0 (1- velicinaTabele))
     (cond ((= velicinaTabele 4) 
-           ; (proveriSveZY4 0)
-            ;(proveriSveYX4 0)
-            ;(proveriSveZX4 0)
+            (proveriSveZY4 0)
+            (proveriSveYX4 0)
+            (proveriSveZX4 0)
             (proveri3DDijagonale4)
     ) 
          ((= velicinaTabele 6)
-            ;(proveriSveZY6 0)
-            ;(proveriSveYX6 0)
-            ;(proveriSveZX6 0)
+            (proveriSveZY6 0)
+            (proveriSveYX6 0)
+            (proveriSveZX6 0)
+            (proveri3DDijagonale6 5)
          )
     )
     (format t "~% xPoints: ")
@@ -338,12 +343,133 @@
     (proveriDijagonalu 3 0 0 -1 0 0 -1 1 1 3 -1)
 )
 
-(defun proveri3DDijagonale4 () 
-    (proveriDijagonalu 0 3 0 4 0 0 1 -1 1 0 1)
-    (proveriDijagonalu 0 0 0 4 0 0 1 1 1 0 1)
+(defun proveri3DDijagonale6 (y) 
+    ;;(cond ((= y 2) '()) (t 
+    ; . . . . . .
+    ; . . . . . .
+    ; . . . . . .
+    ; , , , . . .
+    ; , , , . . .
+    ; , , , . . .
+    
+    (proveriDijagonalu 1 5 1 -1 0 0 1 -1 1 5 -1)
+    (proveriDijagonalu 2 5 2 -1 0 0 1 -1 1 5 -1)
+    (proveriDijagonalu 1 5 2 -1 0 0 1 -1 1 5 -1)
+    (proveriDijagonalu 2 5 1 -1 0 0 1 -1 1 5 -1)
+
+    (proveriDijagonalu 0 5 0 -1 0 0 1 -1 1 5 -1)
+    (proveriDijagonalu 0 5 1 -1 0 0 1 -1 1 5 -1)
+    (proveriDijagonalu 0 5 2 -1 0 0 1 -1 1 5 -1)
+    (proveriDijagonalu 1 5 0 -1 0 0 1 -1 1 5 -1)
+    (proveriDijagonalu 2 5 0 -1 0 0 1 -1 1 5 -1)
+    
+    (proveriDijagonalu 0 4 0 -1 0 0 1 -1 1 4 -1)
+    (proveriDijagonalu 0 4 1 -1 0 0 1 -1 1 4 -1)
+    (proveriDijagonalu 0 4 2 -1 0 0 1 -1 1 4 -1)
+    (proveriDijagonalu 1 4 0 -1 0 0 1 -1 1 4 -1)    
+    (proveriDijagonalu 2 4 0 -1 0 0 1 -1 1 4 -1)
+
+    (proveriDijagonalu 0 3 0 -1 0 0 1 -1 1 3 -1)
+    (proveriDijagonalu 0 3 1 -1 0 0 1 -1 1 3 -1)
+    (proveriDijagonalu 0 3 2 -1 0 0 1 -1 1 3 -1)
+    (proveriDijagonalu 1 3 0 -1 0 0 1 -1 1 3 -1)    
+    (proveriDijagonalu 2 3 0 -1 0 0 1 -1 1 3 -1)
+
+    ; . . . . . .
+    ; . . . . . .
+    ; . . . . . .
+    ; . . . , , ,
+    ; . . . , , ,
+    ; . . . , , ,
+    
+    (proveriDijagonalu 1 5 3 -1 0 0 1 -1 -1 3 -1)
+    (proveriDijagonalu 2 5 3 -1 0 0 1 -1 -1 3 -1)
+    (proveriDijagonalu 1 5 4 -1 0 0 1 -1 -1 4 -1)
+    (proveriDijagonalu 2 5 4 -1 0 0 1 -1 -1 4 -1)
+
+    (proveriDijagonalu 0 5 3 -1 0 0 1 -1 -1 3 -1)
+    (proveriDijagonalu 0 5 4 -1 0 0 1 -1 -1 4 -1)
+    (proveriDijagonalu 0 5 5 -1 0 0 1 -1 -1 5 -1)
+    (proveriDijagonalu 1 5 5 -1 0 0 1 -1 -1 5 -1)
+    (proveriDijagonalu 2 5 5 -1 0 0 1 -1 -1 5 -1)
+    
+    (proveriDijagonalu 0 4 3 -1 0 0 1 -1 -1 3 -1)
+    (proveriDijagonalu 0 4 4 -1 0 0 1 -1 -1 4 -1)
+    (proveriDijagonalu 0 4 5 -1 0 0 1 -1 -1 4 -1)
+    (proveriDijagonalu 1 4 5 -1 0 0 1 -1 -1 4 -1)    
+    (proveriDijagonalu 2 4 5 -1 0 0 1 -1 -1 4 -1)
+
+    (proveriDijagonalu 0 3 3 -1 0 0 1 -1 -1 3 -1)
+    (proveriDijagonalu 0 3 4 -1 0 0 1 -1 -1 3 -1)
+    (proveriDijagonalu 0 3 5 -1 0 0 1 -1 -1 3 -1)
+    (proveriDijagonalu 1 3 5 -1 0 0 1 -1 -1 3 -1)    
+    (proveriDijagonalu 2 3 5 -1 0 0 1 -1 -1 3 -1)
+
+    ; , , , . . .
+    ; , , , . . .
+    ; , , , . . .
+    ; . . . . . .
+    ; . . . . . .
+    ; . . . . . .
+    
+    (proveriDijagonalu 3 5 1 -1 0 0 -1 -1 1 3 -1)
+    (proveriDijagonalu 3 5 2 -1 0 0 -1 -1 1 3 -1)
+    (proveriDijagonalu 4 5 2 -1 0 0 -1 -1 1 4 -1)
+    (proveriDijagonalu 4 5 1 -1 0 0 -1 -1 1 4 -1)
+
+    (proveriDijagonalu 5 5 0 -1 0 0 -1 -1 1 5 -1)
+    (proveriDijagonalu 4 5 0 -1 0 0 -1 -1 1 4 -1)
+    (proveriDijagonalu 3 5 0 -1 0 0 -1 -1 1 3 -1)
+    (proveriDijagonalu 5 5 1 -1 0 0 -1 -1 1 5 -1)
+    (proveriDijagonalu 5 5 2 -1 0 0 -1 -1 1 5 -1)
+    
+    (proveriDijagonalu 5 4 0 -1 0 0 -1 -1 1 4 -1)
+    (proveriDijagonalu 4 4 0 -1 0 0 -1 -1 1 4 -1)
+    (proveriDijagonalu 3 4 0 -1 0 0 -1 -1 1 3 -1)
+    (proveriDijagonalu 5 4 1 -1 0 0 -1 -1 1 4 -1)    
+    (proveriDijagonalu 5 4 2 -1 0 0 -1 -1 1 4 -1)
+
+    (proveriDijagonalu 5 3 0 -1 0 0 -1 -1 1 3 -1)
+    (proveriDijagonalu 4 3 0 -1 0 0 -1 -1 1 3 -1)
     (proveriDijagonalu 3 3 0 -1 0 0 -1 -1 1 3 -1)
-    (proveriDijagonalu 3 0 0 -1 0 0 -1 1 1 3 -1)
+    (proveriDijagonalu 5 3 1 -1 0 0 -1 -1 1 3 -1)    
+    (proveriDijagonalu 5 3 2 -1 0 0 -1 -1 1 3 -1)
+
+    ; . . . , , ,
+    ; . . . , , ,
+    ; . . . , , ,
+    ; . . . . . .
+    ; . . . . . .
+    ; . . . . . .
+    
+    (proveriDijagonalu 3 5 3 -1 0 0 -1 -1 -1 3 -1)
+    (proveriDijagonalu 3 5 4 -1 0 0 -1 -1 -1 3 -1)
+    (proveriDijagonalu 4 5 3 -1 0 0 -1 -1 -1 3 -1)
+    (proveriDijagonalu 4 5 4 -1 0 0 -1 -1 -1 4 -1)
+
+    (proveriDijagonalu 5 5 3 -1 0 0 -1 -1 -1 3 -1)
+    (proveriDijagonalu 4 5 5 -1 0 0 -1 -1 -1 4 -1)
+    (proveriDijagonalu 3 5 5 -1 0 0 -1 -1 -1 3 -1)
+    (proveriDijagonalu 5 5 4 -1 0 0 -1 -1 -1 4 -1)
+    (proveriDijagonalu 5 5 5 -1 0 0 -1 -1 -1 5 -1)
+    
+    (proveriDijagonalu 5 4 3 -1 0 0 -1 -1 -1 3 -1)
+    (proveriDijagonalu 4 4 5 -1 0 0 -1 -1 -1 4 -1)
+    (proveriDijagonalu 3 4 5 -1 0 0 -1 -1 -1 3 -1)
+    (proveriDijagonalu 5 4 4 -1 0 0 -1 -1 -1 4 -1)
+    (proveriDijagonalu 5 4 5 -1 0 0 -1 -1 -1 4 -1)
+
+    (proveriDijagonalu 5 3 3 -1 0 0 -1 -1 -1 3 -1)
+    (proveriDijagonalu 4 3 5 -1 0 0 -1 -1 -1 3 -1)
+    (proveriDijagonalu 3 3 5 -1 0 0 -1 -1 -1 3 -1)
+    (proveriDijagonalu 5 3 4 -1 0 0 -1 -1 -1 3 -1)
+    (proveriDijagonalu 5 3 5 -1 0 0 -1 -1 -1 3 -1)
+    
+
+        ;(proveri3DDijagonale6 (1- y))
+    ;))
 )
+
 
 (main)
 
