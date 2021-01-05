@@ -18,7 +18,8 @@
 
     ;;(let ((tabelaZaIspitivanje tabela)))
     (format t "~%")
-    (potez tabela)
+    ;;(potez tabela)
+    (ispitajPoteze tabela)
     (potpunPrikaz tabela)
 )
 
@@ -130,33 +131,43 @@
 (defun potez (tabelaZaIspitivanje)
   
    
-    (format t "~%Potez: ")
-    (setq potez (read))
-    (proveriPotez (write-to-string potez) tabelaZaIspitivanje)
+   ;; (format t "~%Potez: ")
+   ;; (setq potez (read))
+    ;;(proveriPotez (write-to-string potez) tabelaZaIspitivanje)
   
-    (potpunPrikaz tabela)
-    (potpunPrikaz tabelaZaIspitivanje)
-    (cond ((jeKrajIgre 0 0) (potpunPrikaz)(format t "~%Kraj igre.")) 
-    (t '())
-    )
+   ;; (potpunPrikaz tabela)
+   ;; (potpunPrikaz tabelaZaIspitivanje)
+   ;; (cond ((jeKrajIgre 0 0) (potpunPrikaz)(format t "~%Kraj igre.")) 
+   ;; (t '())
+;)
 )
 
  
 
-(defun proveriPotez (potez tabelaZaIspitivanje)
-    (setq temp (- (char-code (char potez 0)) 55)) 
-    (cond ((< temp 10) (incf temp 7)))
-    (setq rbrReda (floor temp velicinaTabele))
-    (setq rbrStubica (mod temp velicinaTabele))
-    (cond ((or (>= rbrReda velicinaTabele) (< rbrReda 0)) (format t "Nepravilan potez ~%") '())
+(defun ispitajPoteze(tabelaZaIspitivanje)
+  (setq lista '())
+  (setq polja (list 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15))
+  (proveriPoteze  (car polja) tabelaZaIspitivanje (cdr polja))
+  (setq lista (reverse lista))
+  (format t "~% Konacna lista: ") (princ lista) (format t "~%") 
+)
+
+(defun proveriPoteze (potez tabelaZaIspitivanje ostatakliste)
+    ;;(princ (char potez 0)) (format t "~%")
+    ;;(setq temp (- (char-code (char potez 0)) 55)) 
+    ;;(cond ((< temp 10) (incf temp 7)))
+    (setq rbrReda (floor potez velicinaTabele))
+    (setq rbrStubica (mod potez velicinaTabele))
+    (princ rbrReda) (format t "~%") (princ rbrStubica) (format t "~%")
+    (cond ((or (>= rbrReda velicinaTabele) (< rbrReda 0)) '() )
         (t 
          (cond ((equal (nth rbrStubica (nth 0 (nth rbrReda tabelaZaIspitivanje))) '-) 
-               
-                (odigrajPotez rbrReda rbrStubica (- velicinaTabele 1) tabelaZaIspitivanje) (promeniIgraca) t)
-          
-               (t (format t "Stubic je popunjen ~%") '()))
+                (push potez lista) (princ lista) (format t "~%") 
+                )
+               (t '() ))
         )
-          )
+          ) 
+    (cond ((equal (car ostatakliste) '()) ()) (t (proveriPoteze (car ostatakliste) tabelaZaIspitivanje (cdr ostatakliste)))) 
     
 )
 
