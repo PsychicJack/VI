@@ -5,6 +5,7 @@
     (setq velicinaTabele 4)
     (setq trentuniIgrac 'H)
     (setq trenutnaBoja 'X)
+    (setq dubina 3)
     ;(setq velicinaTabele (read))
     ;(odabirPrvogIgraca)
     ;(odabirBoje)
@@ -22,22 +23,22 @@
     ;(setf (nth 1 (nth 0 (nth 1 tabela))) 'O)
     ;(setf (nth 0 (nth 0 (nth 0 tabela))) 'O)
     ;(setf (nth 0 (nth 0 (nth 0 tabela))) 'O)
-
     
-
-    (setq tabelaZaIspitivanje (copy-tree tabela))
-
-    (format t "~%")
     ;(princ (ispitajPoteze tabela))
-    (setf tabela (potez tabela))
-    (potpunPrikaz tabela)
-   ; (setf (nth 3 (nth 0 (nth 0 tabela))) 'O)
+    ;(setf tabela (potez tabela))
+  
+   
     ;(potpunPrikaz tabela)
    ; (proveriPotez "0" (copy-tree tabela))
    ; (potpunPrikaz (copy-tree tabela))
-    ;(setf (nth 2 (nth 1 (nth 1 tabela))) 'O)
-    ;(setf (nth 1 (nth 2 (nth 2 tabela))) 'O)
-    ;(setf (nth 0 (nth 3 (nth 3 tabela))) 'O)
+   ; (setf (nth 0 (nth 0 (nth 2 tabela))) 'O)
+   ; (setf (nth 0 (nth 1 (nth 2 tabela))) 'O)
+   ; (setf (nth 0 (nth 2 (nth 2 tabela))) 'O)
+   ; (setf (nth 0 (nth 3 (nth 2 tabela))) 'O)
+
+    (format t "~%")
+    (potpunPrikaz tabela)
+    (potez tabela)
 )
 
 (defun odabirPrvogIgraca () 
@@ -155,29 +156,32 @@
 )
 
 
-(defun potez (tabelaZaIspitivanje)
+(defun potez (stanje)
    (cond ((equal trentuniIgrac 'H) 
         (format t "~%Potez: ")
         (setq potez (read))
-        (proveriPotez (write-to-string potez) tabelaZaIspitivanje)
+        (proveriPotez (write-to-string potez) stanje)
     
-        (potpunPrikaz tabelaZaIspitivanje)
-        (cond ((jeKrajIgre 0 0 tabela) (potpunPrikaz tabelaZaIspitivanje) (proveriPoene tabela) (format t "~%Kraj igre. ")
+        (potpunPrikaz stanje)
+        (cond ((jeKrajIgre 0 0 tabela) (potpunPrikaz stanje) (proveriPoene tabela) (format t "~%Kraj igre. ")
             (cond ((= (- xPoints oPoints) 0) (format t "Nereseno!")) ((> (- xPoints oPoints) 0) (format t "Pobednik je crni!")) ((< (- xPoints oPoints) 0) (format t "Pobednik je beli!")))
-            tabelaZaIspitivanje
+            stanje
         ) 
-        (t (proveriPoene tabelaZaIspitivanje) (potez tabelaZaIspitivanje) 
-            tabelaZaIspitivanje
+        (t (proveriPoene stanje) (potez stanje) 
+            stanje
         ))
    )
     (t 
         
-        (setf boi (alfaBeta (copy-tree tabelaZaIspitivanje) 2 most-negative-fixnum most-positive-fixnum trenutnaBoja))
-        (print "IZASLI SMO IZ ALFABETA: ") (print boi)
-        (setq tabelaZaIspitivanje (proveriPotezAlfaBeta (nth 1 (alfaBeta tabela 4 most-negative-fixnum most-positive-fixnum trenutnaBoja)) tabelaZaIspitivanje trenutnaBoja))
-        (potpunPrikaz tabelaZaIspitivanje)
-        (promeniIgraca)
-        (potez tabela)
+       ;; (setf boi (alfaBeta (copy-tree stanje) 2 most-negative-fixnum most-positive-fixnum trenutnaBoja))
+       (let ((potez (alfaBeta stanje '() most-negative-fixnum most-positive-fixnum dubina trenutnaBoja)))
+            (print "IZASLI SMO IZ ALFABETA: ") (print potez)
+            (proveriPotezAlfaBeta potez stanje trenutnaBoja)
+            ;;(setq stanje (proveriPotezAlfaBeta (nth 1 (alfaBeta tabela 4 most-negative-fixnum most-positive-fixnum trenutnaBoja)) stanje trenutnaBoja))
+            (potpunPrikaz stanje)
+            (promeniIgraca)
+            (potez tabela)
+       )
     )
     )
 )
@@ -231,10 +235,10 @@
     ;(PRINT "UNUTAR PROVERI POENE |||||||||||||||||||||||||||||||")
     (setq xPoints 0)
     (setq oPoints 0)
-    (proveriSveY 0 0 stanje)
+    ;(proveriSveY 0 0 stanje)
     (proveriSveZ (1- velicinaTabele) 0 stanje)
     (proveriSveX 0 (1- velicinaTabele) stanje)
-    (cond ((= velicinaTabele 4) 
+   (cond ((= velicinaTabele 4) 
             (proveriSveZY4 0 stanje)
             (proveriSveYX4 0 stanje)
             (proveriSveZX4 0 stanje)
@@ -247,11 +251,15 @@
             (proveri3DDijagonale6 5 stanje)
         )
     )
-   ; (format t "~% xPoints: ")
-  ;  (princ xPoints)
-   ; (format t "~% oPoints: ")
-   ; (princ oPoints)
-    ;(format t "~%")
+    
+        
+    ;; (format t "~% xPoints: ")
+    ;; (princ xPoints)
+    ;; (format t "~% oPoints: ")
+    ;; (princ oPoints)
+    ;; (format t "~%")
+        
+   
     (- xPoints oPoints)
 )
 
@@ -580,103 +588,77 @@
   ;  )
     
 ;)
-(defun alfaBeta (stanje dubina alfa beta igracNaPotezu)
-    ;(format t "~%")
-    ;(princ "DUBINA: " ) (princ dubina) (format t "~%")
-    ;(princ "IGRAC NA POTEZU: ") (princ igracNaPotezu) (format t "~%")
-    ;(print "UNUTAR ALFA BETA") (potpunPrikaz stanje)
-    (cond ((or (= dubina 0) (jeKrajIgre 0 0 stanje)) 
-            ;(print "ALFA BETA ZAVRSIO") 
-            (list (proveriPoene stanje) -1)
-        )
-        (t 
-            (cond ((equal igracNaPotezu 'X)
-                (let ((vrednost (list most-negative-fixnum -1)))
-                   ; (print (ispitajPoteze stanje))
-                    (loop for potez in (ispitajPoteze stanje)
-                        do (setf (nth 1 vrednost) potez) 
-                        (setf vrednost (maksimum vrednost (alfaBeta (copy-tree (proveriPotezAlfaBeta potez (copy-tree stanje) 'X))  (1- dubina) alfa beta 'O)))
-                        ;(format t "~%") (princ "VREDNOST: " ) (princ vrednost)
-                        (setf alfa (max alfa (car vrednost)))
-                         (cond ((>= alfa beta) '())
-                        )
+
+(defun promeniIgracaAlfaBeta (value) 
+    (if (equal value 'X) 'O 'X)
+)
+
+(defun alfaBeta (stanje potez alfa beta trenutnaDubina igracNaPotezu)
+    (cond
+        ((zerop trenutnaDubina) (list potez (proveriPoene stanje)))
+        (t
+            (let*
+                (
+                    (listaPoteza (ispitajPoteze stanje))
+                    (vrednost
+                        (if (equal igracNaPotezu 'X)
+                            (maxIgrac listaPoteza '() trenutnaDubina alfa beta stanje igracNaPotezu)
+                            (minIgrac listaPoteza '() trenutnaDubina alfa beta stanje igracNaPotezu)
+                        ) 
                     )
-                vrednost
                 )
-                
-            )
-            ((equal igracNaPotezu 'O)
-                (let ((vrednost (list most-positive-fixnum -1)))
-               ; (print (ispitajPoteze stanje))
-                    (loop for potez in (ispitajPoteze stanje)
-                        do (setf (nth 1 vrednost) potez)
-                        (setf vrednost (minimum vrednost (alfaBeta (copy-tree (proveriPotezAlfaBeta potez (copy-tree stanje) 'O))  (1- dubina) alfa beta 'X)))
-                        ;(format t "~%") (princ "VREDNOST: " ) (princ vrednost)
-                        (setf beta (min beta (car vrednost)))
-                         (cond ((>= alfa beta) '())
-                        )
-                    )
-                vrednost
+                ;(format t "~%GENERATED potezS: ~a~%" listaPoteza)
+                (cond
+                    ((null listaPoteza) (list potez (proveriPoene stanje)))
+                    ((equalp trenutnaDubina dubina) (car vrednost))
+                    (t (list potez (cadr vrednost)))
                 )
             )
-           ) 
+        )       
+    )
+)
+
+(defun maxIgrac (listaPoteza najboljiPotez dubina alfa beta predhodnoStanje igracNaPotezu)
+    (cond 
+        ((null listaPoteza) (list najboljiPotez alfa))
+        (t ;(potpunPrikaz predhodnoStanje)
+            (let*
+                (                
+                    (sledeceStanje (proveriPotezAlfaBeta (car listaPoteza) (copy-tree predhodnoStanje) igracNaPotezu))
+                    (minpotez (alfaBeta sledeceStanje (car listaPoteza)  alfa beta (1- dubina) (promeniIgracaAlfaBeta igracNaPotezu)))
+                    (noviPotez (if (>= alfa (cadr minpotez)) (list najboljiPotez alfa) minpotez))
+                )
+                (if (or (> (cadr noviPotez) beta) (null listaPoteza))
+                        (list najboljiPotez (cadr noviPotez))
+                        (maxIgrac (cdr listaPoteza) (car noviPotez) dubina (cadr noviPotez) beta predhodnoStanje igracNaPotezu)
+                )
+            )
         )
     )
 )
 
-
-(defun maksimum (a b)
-;(format t "~%") (princ "MAX A: " ) (princ a)
-;(format t "~%") (princ "MAX B: " ) (princ b)
-    (cond ((>= (car a) (car b)) a) (t b))
-)
-(defun minimum (a b)
-;(format t "~%") (princ "MIN A: " ) (princ a)
-;(format t "~%") (princ "MIN B: " ) (princ b)
-    (cond ((>= (car a) (car b)) b) (t a))
-)
-
-(defun xIgra (stanje dubina alfa beta igracNaPotezu potezi vrednost)
-    (print potezi)
-    (cond ((null potezi) vrednost) (t
-        (setf potez (car potezi))
-
-        (setf (nth 1 vrednost) potez)
-        (let ((novoStanje (proveriPotezAlfaBeta potez (copy-tree stanje) 'X)))
-        ;(print "NOVO STANJE") (potpunPrikaz novoStanje)
-            (cond ((null novoStanje) (print "GRESKA!!!") '()) (t
-                (setf vrednost (maksimum vrednost (alfaBeta (copy-tree novoStanje) (1- dubina) alfa beta 'O)))
-                
-                (setf alfa (max alfa (car vrednost)))
-                (cond ((>= alfa beta) vrednost)
-                    (t (xIgra stanje dubina alfa beta igracNaPotezu (cdr potezi) vrednost))
+(defun minIgrac (listaPoteza najboljiPotez dubina alfa beta predhodnoStanje igracNaPotezu)
+    (cond 
+        ((null listaPoteza) (list najboljiPotez beta))
+        (t ;(potpunPrikaz predhodnoStanje)
+            (let*
+                (    
+                    (sledeceStanje (proveriPotezAlfaBeta (car listaPoteza) (copy-tree predhodnoStanje) igracNaPotezu))     
+                    (maxpotez (alfaBeta sledeceStanje (car listaPoteza) alfa beta (1- dubina) (promeniIgracaAlfaBeta igracNaPotezu)))
+                    (noviPotez (if (<= beta (cadr maxpotez)) (list najboljiPotez beta) maxpotez))
                 )
-            ))
-        )
-    ))
-)
-
-(defun oIgra (stanje dubina alfa beta igracNaPotezu potezi vrednost)
-    (print potezi)
-    (cond ((null potezi) vrednost) (t
-        (setf potez (car potezi))
-
-        (setf (nth 1 vrednost) potez)
-        (let ((novoStanje (proveriPotezAlfaBeta potez (copy-tree stanje) 'O)))
-            (cond ((null novoStanje) (princ "GRESKA!!!") '()) (t
-                (setf vrednost (minimum vrednost (alfaBeta (copy-tree novoStanje) (1- dubina) alfa beta 'X)))
-
-                (setf beta (min beta (car vrednost)))
-                (cond ((>= alfa beta) vrednost)
-                    (t (oIgra (copy-tree stanje) dubina alfa beta igracNaPotezu (cdr potezi) vrednost))
+                (if (or (< (cadr noviPotez) alfa)(null (cdr listaPoteza)))
+                        (list najboljiPotez (cadr noviPotez))
+                        (minIgrac (cdr listaPoteza) (car noviPotez) dubina alfa (cadr noviPotez) predhodnoStanje igracNaPotezu)
                 )
-            ))
+            )
         )
-    ))
+    )
 )
 
-
-
+;(trace alfaBeta)
+;(trace maxIgrac)
+;(trace minIgrac)
 ;;(princ (ispitajPoteze matrica))
 (main)
 
