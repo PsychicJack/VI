@@ -639,9 +639,10 @@
     (cond ((= z velicinaTabele) (setq z 0) (incf y)))
     (cond ((= y velicinaTabele) (setq y 0) (incf x)))
     (cond ((= x velicinaTabele) '())
-        (t 
-            (list 'Na z y x (nth z (nth y (nth x stanje))))
-            (generisiCinjenice stanje (1+ z) y x)
+         (t (cons
+             (list 'Na z y x (nth z (nth y (nth x stanje))))
+             (generisiCinjenice stanje (1+ z) y x)
+            )   
         )
     )
 )
