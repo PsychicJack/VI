@@ -1,11 +1,13 @@
 (setq matrica '(((0 1 2 3) (4 5 6 7) (8 9 A B) (C D E F)) ((G H I J) (K L M N) (O P Q R) (S T U V)) ((W X Y Z) (a b c d) (e f g h) (i j k l)) ((m - o p) (q - s t) (u v w x) (y z - +))))
+
+(load './Inference_engine.cl)
 (defun main()
     
     (princ "Unesite velicinu (4/6): ")
     ;(setq velicinaTabele 4)
     ;(setq trentuniIgrac 'H)
     ;(setq trenutnaBoja 'X)
-    (setq dubina 3)
+    (setq dubina 2)
     (setq velicinaTabele (read))
     (odabirPrvogIgraca)
     (odabirBoje)
@@ -595,7 +597,7 @@
 
 (defun alfaBeta (stanje potez alfa beta trenutnaDubina igracNaPotezu)
     (cond
-        ((zerop trenutnaDubina) (list potez (proveriPoene stanje)))
+        ((zerop trenutnaDubina) (list potez (heuristika stanje igracNaPotezu)))
         (t
             (let*
                 (
@@ -655,6 +657,88 @@
         )
     )
 )
+
+
+(defun !daLiXPobedjuje (stanje)
+    (cond ((> (proveriPoene stanje) 0) t) (t '()))
+)
+
+(defun !daLiOPobedjuje (stanje)
+    (cond ((< (proveriPoene stanje) 0) t) (t '()))
+)
+
+(defun !daLiXDobijaPoene (stanje)
+    (let* 
+        (
+            (praviPoeni (proveriPoene tabela))
+            (noviPoeni (proveriPoene stanje))
+        )
+        (progn
+            (cond ((> noviPoeni praviPoeni) t) (t '()))
+        )
+    )
+)
+
+(defun !daLiODobijaPoene (stanje)
+    (let* 
+        (
+            (praviPoeni (proveriPoene tabela))
+            (noviPoeni (proveriPoene stanje))
+        )
+        (progn
+            (cond ((< noviPoeni praviPoeni) t) (t '()))
+        )
+    )
+)
+
+(defparameter *RULES*
+    '(
+        (if (!daLiXPobedjuje novoStanje) then (XPobednik))
+        (if (!daLiOPobedjuje novoStanje) then (OPobednik))
+        (if (!daLiXDobijaPoene novoStanje) then (XVodi))
+        (if (!daLiODobijaPoene novoStanje) then (OVodi))
+    )
+
+)
+
+(defun generisiCinjenice (stanje z y x)
+    (cond ((= z velicinaTabele) (setq z 0) (incf y)))
+    (cond ((= y velicinaTabele) (setq y 0) (incf x)))
+    (cond ((= x velicinaTabele) '())
+        (t 
+            (list 'Na z y x (nth z (nth y (nth x stanje))))
+            (generisiCinjenice stanje (1+ z) y x)
+        )
+    )
+)
+
+(defun heuristika (stanje igracNaPotezu)
+    (setq novoStanje (copy-tree stanje))
+    (let* 
+        (
+            (*FACTS* (generisiCinjenice stanje 0 0 0))
+        )
+        (progn
+            (prepare-knowledge *RULES* *FACTS* 10)
+            (let* 
+                (
+                    (pravilo1 (if (/= (count-results '(XPobednik)) 0) (if (equalp igracNaPotezu 'X) 1000 -1000) 0))
+                    (pravilo2 (if (/= (count-results '(OPobednik)) 0) (if (equalp igracNaPotezu 'O) -1000 1000) 0))
+                    (pravilo3 (if (/= (count-results '(XVodi)) 0) (if (equalp igracNaPotezu 'X) 500 -500) 0))
+                    (pravilo4 (if (/= (count-results '(OVodi)) 0) (if (equalp igracNaPotezu 'O) -500 500) 0))
+                    (acc (+ pravilo1 pravilo2 pravilo3 pravilo4))
+                )
+                (progn
+                    acc
+                )
+            )
+        )
+    )
+)
+
+
+
+
 
 ;(trace alfaBeta)
 ;(trace maxIgrac)
