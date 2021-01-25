@@ -607,7 +607,7 @@
 
 (defun alfaBeta (stanje potez alfa beta trenutnaDubina igracNaPotezu)
     (cond
-        ((zerop trenutnaDubina) (list potez (proveriPoene stanje)))
+        ((zerop trenutnaDubina) (list potez (heuristika stanje igracNaPotezu)))
         (t
             (let*
                 (
