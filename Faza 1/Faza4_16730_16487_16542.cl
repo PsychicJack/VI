@@ -219,7 +219,8 @@
 
     (setq xPoints 0)
     (setq oPoints 0)
-    
+
+    (proveriSveY 0 0 stanje)
     (proveriSveZ (1- velicinaTabele) 0 stanje)
     (proveriSveX 0 (1- velicinaTabele) stanje)
    (cond ((= velicinaTabele 4) 
@@ -540,7 +541,7 @@
                 )
                 
                 (cond
-                    ((null listaPoteza) (list potez (proveriPoene stanje)))
+                    ((null listaPoteza) (list potez (heuristika stanje igracNaPotezu)))
                     ((equalp trenutnaDubina dubina) (car vrednost))
                     (t (list potez (cadr vrednost)))
                 )

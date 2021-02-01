@@ -1,4 +1,4 @@
-;(setq tabela '(((X X X X) (X X X X) (X X X X) (X X X X)) ((X X X X) (X X X X) (X X X X) (X X X X)) ((X X X X) (X X X X) (X X X X) (X X X X)) ((O X - -) (X X X X) (X X X X) (X X X X))))
+
 
 (load './Inference_engine.cl)
 (defun main()
@@ -10,8 +10,8 @@
     (odabirPrvogIgraca)
     (odabirBoje)
 
-
     (setq tabela (inicijalizujTabelu '0))
+    
 
     (format t "~%")
     (potpunPrikaz tabela)
@@ -47,7 +47,7 @@
         )
      ) 
 )
-(defun inicijalizujRed (rbrReda rbrKolone);; promena iz '(- - - -) -> (list '- '- '- '-)
+(defun inicijalizujRed (rbrReda rbrKolone)
     (cond 
         ((<= rbrKolone 0) '())
 		(t (if (= 4 velicinaTabele)
@@ -60,14 +60,14 @@
     )
 )
 
-(defun potpunPrikaz (stanje) ;; prikaz tabela sa prikazom numeracije polja
-    (cond ((= velicinaTabele 4) (format t "~%0123456789ABCDEF")) ((= velicinaTabele 6) (format t "~%0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
+(defun potpunPrikaz (stanje) 
+    (cond ((= velicinaTabele 4) (format t "~%0123456789ABCDEF")) ((= velicinaTabele 6) (format t "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
     (format t "~%")
     (prikazStanja velicinaTabele velicinaTabele 0 velicinaTabele stanje)
     (cond ((= velicinaTabele 4) (format t "0123456789ABCDEF")) ((= velicinaTabele 6) (format t "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
 )
 
-(defun prikazStanja (od do ind1 ind2 stanje) ;; radi prika tabela
+(defun prikazStanja (od do ind1 ind2 stanje) 
     (decf ind2)
     (cond ((= ind2 -1) (setq ind2 0) (incf ind1)))
     (decf od)
@@ -75,7 +75,7 @@
     (cond ((= do 0) '()) (t (stampajRed od do 0 ind1 ind2 stanje) (format t "~%") (prikazStanja od do ind1 ind2 stanje)))
 )
  
-(defun stampajRed (od do count ind1 ind2 stanje) ;; stampa ceo red na prikazu, ne red u listi (npr. za prvi red "   -   -   -   -", za drugi "  --  --  --  --")
+(defun stampajRed (od do count ind1 ind2 stanje)
 
     (cond ((= count velicinaTabele) '()) 
     (t  (stampajBlankoOd od '0) 
@@ -87,7 +87,7 @@
     )
 )
  
-(defun stampajBlankoOd (od trenutni) ;; stampa razmake sa leve strane reda matrice
+(defun stampajBlankoOd (od trenutni) 
     (cond ((= od trenutni) '()) (t (format t " ") (stampajBlankoOd od (1+ trenutni))))
 )
 
@@ -99,7 +99,7 @@
     )
 )
 
-(defun stampajBlankoDo (stampajDo granica) ;; stampa razmake sa desne strane reda matrice
+(defun stampajBlankoDo (stampajDo granica) 
     (cond ((= stampajDo granica) '()) (t (format t " ") (stampajBlankoDo (1+ stampajDo) granica))) 
 )
 
@@ -112,18 +112,18 @@
         (t (proveriPoteze  (car polja6) tabelaZaIspitivanje (cdr polja6)))
                )
   lista
-  ;;(format t "~% Konacna lista: ") (princ lista) (format t "~%") 
+
 )
  
 (defun proveriPoteze (potez tabelaZaIspitivanje ostatakliste)
     
     (setq rbrReda (floor potez velicinaTabele))
     (setq rbrStubica (mod potez velicinaTabele))
-    ;;(princ rbrReda) (format t "~%") (princ rbrStubica) (format t "~%")
+
     (cond ((or (>= rbrReda velicinaTabele) (< rbrReda 0)) '() )
         (t 
          (cond ((equal (nth rbrStubica (nth 0 (nth rbrReda tabelaZaIspitivanje))) '-) 
-                (push potez lista) ;(princ lista) (format t "~%") 
+                (push potez lista) 
                 )
                (t '() ))
         )
@@ -137,35 +137,33 @@
    (cond ((equal trentuniIgrac 'H) 
         (format t "~%Potez: ")
         (setq potez (read))
-        (proveriPotez (write-to-string potez) stanje) ; igra potez
+        (proveriPotez (write-to-string potez) stanje)
     
         (potpunPrikaz stanje)
         (cond ((jeKrajIgre 0 0 tabela) (potpunPrikaz stanje) (proveriPoene tabela) (format t "~%Kraj igre. Crni je imao ~a poena, a beli ~a " xPoints oPoints) 
             (cond ((= (- xPoints oPoints) 0) (format t "Nereseno!")) ((> (- xPoints oPoints) 0) (format t "Pobednik je crni!")) ((< (- xPoints oPoints) 0) (format t "Pobednik je beli!")))
             stanje
         ) 
-        (t ;ako nije kraj igre, nastavlja dalje
+        (t 
             (potez stanje) 
             stanje
         ))
    )
     (t 
         
-       
-       (let ((potez (alfaBeta stanje '() most-negative-fixnum most-positive-fixnum dubina trenutnaBoja))) ;; poziva alfa beta za trenutno stanje
-           
-            (cond ((null potez) (setq potez (car (ispitajPoteze tabela))))) ; ukoliko ne nadje ni jedan potez, igra prvi moguci
-            (proveriPotezAlfaBeta potez stanje trenutnaBoja) ;; proverava da li je potez moguc i odigra ga za alfa beta
-           
-            (potpunPrikaz stanje) 
+
+       (let ((potez (alfaBeta stanje '() most-negative-fixnum most-positive-fixnum dubina trenutnaBoja)))
+
+            (cond ((null potez) (setq potez (car (ispitajPoteze tabela)))))
+            (proveriPotezAlfaBeta potez stanje trenutnaBoja)
+
+            (potpunPrikaz stanje)
             (promeniIgraca)
-            ;;provera kraja
             (cond ((jeKrajIgre 0 0 tabela) (potpunPrikaz stanje) (proveriPoene tabela)  (format t "~%Kraj igre. Crni je imao ~a poena, a beli ~a " xPoints oPoints)
             (cond ((= (- xPoints oPoints) 0) (format t "Nereseno!")) ((> (- xPoints oPoints) 0) (format t "Pobednik je crni!")) ((< (- xPoints oPoints) 0) (format t "Pobednik je beli!")))
-
             stanje
             ) 
-            (t ; ukoliko nije kraj igre, nastavi dalje
+            (t 
                 (potez tabela) 
                 tabela
             ))
@@ -175,16 +173,16 @@
 )
 
 
-(defun proveriPotez (potez tabelaZaIspitivanje) ; konvertuje char potez u number i odigrava potez ukoliko je to moguce
+(defun proveriPotez (potez tabelaZaIspitivanje)
     (setq temp (- (char-code (char potez 0)) 55)) 
     (cond ((< temp 10) (incf temp 7)))
     (setq rbrReda (floor temp velicinaTabele))
     (setq rbrStubica (mod temp velicinaTabele))
     (cond ((or (>= rbrReda velicinaTabele) (< rbrReda 0)) (format t "Nepravilan potez ~%") '())
         (t 
-         (cond ((equal (nth rbrStubica (nth 0 (nth rbrReda tabelaZaIspitivanje))) '-) ; proverava da li je prazno polje 
+         (cond ((equal (nth rbrStubica (nth 0 (nth rbrReda tabelaZaIspitivanje))) '-) 
                
-                (odigrajPotez rbrReda rbrStubica (- velicinaTabele 1) tabelaZaIspitivanje  trenutnaBoja) (promeniIgraca)) ; odigrava potez ako jeste
+                (odigrajPotez rbrReda rbrStubica (- velicinaTabele 1) tabelaZaIspitivanje  trenutnaBoja) (promeniIgraca))
           
                (t (format t "Stubic je popunjen ~%") '()))
         )
@@ -193,7 +191,7 @@
 )
 
 
-(defun odigrajPotez (rbrReda rbrStubica trenutni tabelaZaIspitivanje boja) ; ide odozdo i nalazi prvo slobodno mesto na stubicu
+(defun odigrajPotez (rbrReda rbrStubica trenutni tabelaZaIspitivanje boja)
     (cond ((equal  (nth rbrStubica (nth trenutni (nth rbrReda tabelaZaIspitivanje))) '-)
            (setf  (nth rbrStubica (nth trenutni (nth rbrReda tabelaZaIspitivanje))) boja)
            )
@@ -208,7 +206,7 @@
 )
 
 
-(defun jeKrajIgre (rbrReda rbrStubica stanje) ;; proverava vrhove stubica i da li su svi razliciti od '-, ako jesu onda je kraj igre
+(defun jeKrajIgre (rbrReda rbrStubica stanje)
     (cond ((>= rbrStubica velicinaTabele) (setq rbrStubica 0) (incf rbrReda)))
     (cond ((>= rbrReda velicinaTabele) t) (t 
     (cond ((not (equal (nth rbrStubica (nth 0 (nth rbrReda stanje))) '-)) (and t (jeKrajIgre rbrReda (1+ rbrStubica) stanje)))
@@ -221,14 +219,13 @@
 
     (setq xPoints 0)
     (setq oPoints 0)
-
-    (proveriSveY 0 0 stanje) ;; proverava poene za stubice
-    (proveriSveZ (1- velicinaTabele) 0 stanje) ; proverava poene ↑
-    (proveriSveX 0 (1- velicinaTabele) stanje) ; proverava poene →
+    
+    (proveriSveZ (1- velicinaTabele) 0 stanje)
+    (proveriSveX 0 (1- velicinaTabele) stanje)
    (cond ((= velicinaTabele 4) 
-            (proveriSveZY4 0 stanje) ; kad je x fiksno proverava dijagonale
-            (proveriSveYX4 0 stanje) ; kad je z fiksno proverava dijagonale
-            (proveriSveZX4 0 stanje) ; kad je y fiksno proverava dijagonale
+            (proveriSveZY4 0 stanje)
+            (proveriSveYX4 0 stanje)
+            (proveriSveZX4 0 stanje)
             (proveri3DDijagonale4 stanje)
     ) 
         ((= velicinaTabele 6)
@@ -237,15 +234,7 @@
             (proveriSveZX6 0 stanje)
             (proveri3DDijagonale6 5 stanje)
         )
-    )
-    
-        
-    ;; (format t "~% xPoints: ")
-    ;; (princ xPoints)
-    ;; (format t "~% oPoints: ")
-    ;; (princ oPoints)
-    ;; (format t "~%")
-        
+    )   
    
     (- xPoints oPoints)
 )
@@ -312,8 +301,6 @@
     ))   
 )
 
-
-;; generalizova funkcija za kretanje kroz kocku, nalazi O i X nizove i povecava poene kada dodje do 4
 (defun proveriDijagonalu (z y x kraj xNiz oNiz incZ incY incX uslov uslovInc stanje) 
     (cond ((= uslov kraj) '())
     (t
@@ -336,13 +323,13 @@
 
 (defun proveriSveZY6 (x stanje)
      (cond ((= x velicinaTabele) '()) (t 
-     ; glavna
+     
         (proveriDijagonalu 0 (1- velicinaTabele) x velicinaTabele 0 0 1 -1 0 0 1 stanje)
         (proveriDijagonalu 0 (- velicinaTabele 2) x (1- velicinaTabele) 0 0 1 -1 0 0 1 stanje)
         (proveriDijagonalu 0 (- velicinaTabele 3) x (- velicinaTabele 2) 0 0 1 -1 0 0 1 stanje)
         (proveriDijagonalu 1 (1- velicinaTabele) x velicinaTabele 0 0 1 -1 0 1 1 stanje)
         (proveriDijagonalu 2 (1- velicinaTabele) x velicinaTabele 0 0 1 -1 0 2 1 stanje)
-        ;sporedna
+        
         (proveriDijagonalu 5 (1- velicinaTabele) x -1 0 0 -1 -1 0 5 -1 stanje)
         (proveriDijagonalu 5 (- velicinaTabele 2) x 0 0 0 -1 -1 0 5 -1 stanje)
         (proveriDijagonalu 5 (- velicinaTabele 3) x 1 0 0 -1 -1 0 5 -1 stanje)
@@ -362,13 +349,13 @@
 
 (defun proveriSveYX6 (z stanje)
      (cond ((= z velicinaTabele) '()) (t 
-     ; glavna
+     
         (proveriDijagonalu z (1- velicinaTabele) 0 velicinaTabele 0 0 0 -1 1 0 1 stanje)
         (proveriDijagonalu z (- velicinaTabele 2) 0 (1- velicinaTabele) 0 0 0 -1 1 0 1 stanje)
         (proveriDijagonalu z (- velicinaTabele 3) 0 (- velicinaTabele 2) 0 0 0 -1 1 0 1 stanje)
         (proveriDijagonalu z (1- velicinaTabele) 1 velicinaTabele 0 0 0 -1 1 1 1 stanje)
         (proveriDijagonalu z (1- velicinaTabele) 2 velicinaTabele 0 0 0 -1 1 2 1 stanje)
-     ;sporedna
+     
         (proveriDijagonalu z (1- velicinaTabele) 5 -1 0 0 0 -1 -1 5 -1 stanje)
         (proveriDijagonalu z (- velicinaTabele 2) 5 0 0 0 0 -1 -1 5 -1 stanje)
         (proveriDijagonalu z (- velicinaTabele 3) 5 1 0 0 0 -1 -1 5 -1 stanje)
@@ -388,13 +375,13 @@
 
 (defun proveriSveZX6 (y stanje)
      (cond ((= y velicinaTabele) '()) (t 
-     ; glavna
+    
         (proveriDijagonalu 0 y 0 velicinaTabele 0 0 1 0 1 0 1 stanje)
         (proveriDijagonalu 0 y 1 (1- velicinaTabele) 0 0 1 0 1 0 1 stanje)
         (proveriDijagonalu 0 y 2 (- velicinaTabele 2) 0 0 1 0 1 0 1 stanje)
         (proveriDijagonalu 1 y 0 velicinaTabele 0 0 1 0 1 1 1 stanje)
         (proveriDijagonalu 2 y 0 velicinaTabele 0 0 1 0 1 2 1 stanje)
-     ;sporedna
+    
         (proveriDijagonalu 0 y 5 velicinaTabele 0 0 1 0 1 0 1 stanje)
         (proveriDijagonalu 0 y 4 (1- velicinaTabele) 0 0 1 0 1 0 1 stanje)
         (proveriDijagonalu 0 y 3 (- velicinaTabele 2) 0 0 1 0 1 0 1 stanje)
@@ -412,13 +399,6 @@
 )
 
 (defun proveri3DDijagonale6 (y stanje) 
-    ;;(cond ((= y 2) '()) (t 
-    ; . . . . . .
-    ; . . . . . .
-    ; . . . . . .
-    ; , , , . . .
-    ; , , , . . .
-    ; , , , . . .
     
     (proveriDijagonalu 1 5 1 -1 0 0 1 -1 1 5 -1 stanje)
     (proveriDijagonalu 2 5 2 -1 0 0 1 -1 1 5 -1 stanje)
@@ -443,12 +423,6 @@
     (proveriDijagonalu 1 3 0 -1 0 0 1 -1 1 3 -1 stanje)    
     (proveriDijagonalu 2 3 0 -1 0 0 1 -1 1 3 -1 stanje)
 
-    ; . . . . . .
-    ; . . . . . .
-    ; . . . . . .
-    ; . . . , , ,
-    ; . . . , , ,
-    ; . . . , , ,
     
     (proveriDijagonalu 1 5 3 -1 0 0 1 -1 -1 3 -1 stanje)
     (proveriDijagonalu 2 5 3 -1 0 0 1 -1 -1 3 -1 stanje)
@@ -473,12 +447,6 @@
     (proveriDijagonalu 1 3 5 -1 0 0 1 -1 -1 3 -1 stanje)    
     (proveriDijagonalu 2 3 5 -1 0 0 1 -1 -1 3 -1 stanje)
 
-    ; , , , . . .
-    ; , , , . . .
-    ; , , , . . .
-    ; . . . . . .
-    ; . . . . . .
-    ; . . . . . .
     
     (proveriDijagonalu 3 5 1 -1 0 0 -1 -1 1 3 -1 stanje)
     (proveriDijagonalu 3 5 2 -1 0 0 -1 -1 1 3 -1 stanje)
@@ -503,12 +471,6 @@
     (proveriDijagonalu 5 3 1 -1 0 0 -1 -1 1 3 -1 stanje)    
     (proveriDijagonalu 5 3 2 -1 0 0 -1 -1 1 3 -1 stanje)
 
-    ; . . . , , ,
-    ; . . . , , ,
-    ; . . . , , ,
-    ; . . . . . .
-    ; . . . . . .
-    ; . . . . . .
     
     (proveriDijagonalu 3 5 3 -1 0 0 -1 -1 -1 3 -1 stanje)
     (proveriDijagonalu 3 5 4 -1 0 0 -1 -1 -1 3 -1 stanje)
@@ -534,11 +496,10 @@
     (proveriDijagonalu 5 3 5 -1 0 0 -1 -1 -1 3 -1 stanje)
     
 
-        ;(proveri3DDijagonale6 (1- y))
-    ;))
+   
 )
-; vraca novo stanje sa odigranim potezom
-(defun proveriPotezAlfaBeta (potez stanje boja) ; provarava validnost poteza da alfa beta i odigrava ga
+
+(defun proveriPotezAlfaBeta (potez stanje boja)
         
         ;;(potpunPrikaz tabelaZaIspitivanje)
         (setq rbrReda (floor potez velicinaTabele))
@@ -565,11 +526,11 @@
     (cond
         ((zerop trenutnaDubina) (list potez (heuristika stanje igracNaPotezu)))
         (t
-            (let* ; deklaracija lokalnih promenjljivih paralelno
+            (let*
                 (
-                    (listaPoteza (ispitajPoteze stanje)) ;; vraca listu mogucih poteza
+                    (listaPoteza (ispitajPoteze stanje))
                     (vrednost
-                        (cond ((equal igracNaPotezu 'X) ; X je max, O je min
+                        (cond ((equal igracNaPotezu 'X)
                                 (maxIgrac listaPoteza '() trenutnaDubina alfa beta stanje igracNaPotezu))
                             (t
                                 (minIgrac listaPoteza '() trenutnaDubina alfa beta stanje igracNaPotezu)
@@ -577,8 +538,9 @@
                         ) 
                     )
                 )
+                
                 (cond
-                    ((null listaPoteza) (list potez (heuristika stanje igracNaPotezu)))
+                    ((null listaPoteza) (list potez (proveriPoene stanje)))
                     ((equalp trenutnaDubina dubina) (car vrednost))
                     (t (list potez (cadr vrednost)))
                 )
@@ -591,16 +553,16 @@
 (defun maxIgrac (listaPoteza najboljiPotez dubina alfa beta predhodnoStanje igracNaPotezu)
     (cond 
         ((null listaPoteza) (list najboljiPotez alfa))
-        (t ;(potpunPrikaz predhodnoStanje)
+        (t 
             (let*
                 (                
                     (sledeceStanje (proveriPotezAlfaBeta (car listaPoteza) (copy-tree predhodnoStanje) igracNaPotezu))
                     (minpotez (alfaBeta sledeceStanje (car listaPoteza)  alfa beta (1- dubina) (promeniIgracaAlfaBeta igracNaPotezu)))
                     (noviPotez (if (>= alfa (cadr minpotez)) (list najboljiPotez alfa) minpotez))
                 )
-                (cond ((or (> (cadr noviPotez) beta) (null listaPoteza)) ;; cutoff
+                (cond ((or (> (cadr noviPotez) beta) (null listaPoteza))
                           (list najboljiPotez (cadr noviPotez)))
-                        (t  ;; petlja
+                        (t
                             (maxIgrac (cdr listaPoteza) (car noviPotez) dubina (cadr noviPotez) beta predhodnoStanje igracNaPotezu)
                         )
                 )
@@ -612,7 +574,7 @@
 (defun minIgrac (listaPoteza najboljiPotez dubina alfa beta predhodnoStanje igracNaPotezu)
     (cond 
         ((null listaPoteza) (list najboljiPotez beta))
-        (t ;(potpunPrikaz predhodnoStanje)
+        (t 
             (let*
                 (    
                     (sledeceStanje (proveriPotezAlfaBeta (car listaPoteza) (copy-tree predhodnoStanje) igracNaPotezu))     
@@ -630,7 +592,7 @@
     )
 )
 
-;; proveriPoene vraca razliku XPoints - OPoints
+
 (defun !daLiXPobedjuje (stanje)
     (cond ((> (proveriPoene stanje) 0) t) (t '()))
 )
@@ -677,7 +639,7 @@
     (cond ((= z velicinaTabele) (setq z 0) (incf y)))
     (cond ((= y velicinaTabele) (setq y 0) (incf x)))
     (cond ((= x velicinaTabele) '())
-        (t (cons
+         (t (cons
              (list 'Na z y x (nth z (nth y (nth x stanje))))
              (generisiCinjenice stanje (1+ z) y x)
             )   
@@ -709,26 +671,5 @@
     )
 )
 
-
-
-
-
-;(trace alfaBeta)
-;(trace maxIgrac)
-;(trace minIgrac)
-;;(princ (ispitajPoteze matrica))
 (main)
 
-
-
-;;(nth ind2 (nth ind1 (nth red matrica)))
-;;(princ (- (char-code (char "A" 0)) 55))
-
-
-;; 1 -> od = 3, do = 4, (0, 3)
-;; 2 -> od = 2, do = 4, (0, 2) (1, 3)
-;; 3 -> od = 1, do = 4, (0, 1) (1, 2) (2, 3)
-;; 4 -> od = 0, do = 4, (0, 0) (1, 1) (2, 2) (3, 3)
-;; 5 -> od = 0, dp = 3, (1, 0) (2, 1) (3, 2)
-;; 6 -> od = 0, do = 2, (2, 0) (3, 1)
-;; 7 -> od = 0, do = 1, (3, 0)
